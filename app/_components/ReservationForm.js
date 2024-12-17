@@ -1,4 +1,9 @@
+"use client";
+
+import { useReservation } from "@/app/_context/ReservationContext";
+
 function ReservationForm({ cabin }) {
+  const { range, setRange } = useReservation();
   // CHANGE
   const { maxCapacity } = cabin;
 
