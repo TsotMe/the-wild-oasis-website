@@ -1,13 +1,16 @@
 "use client";
 
+import Image from "next/image";
 import { updateProfile } from "@/app/_lib/actions";
+import { useActionState } from "react";
 
 function UpdateProfileForm({ guest, children }) {
-  const { fullName, email, nationality, nationalID, countryFlag } = guest;
+  const { fullName, email, nationalID, countryFlag } = guest;
+  const [state, formAction, isPending] = useActionState(updateProfile, null);
 
   return (
     <form
-      action={updateProfile}
+      action={formAction}
       className="bg-primary-900 py-8 px-12 text-lg flex gap-6 flex-col"
     >
       <div className="space-y-2">
@@ -33,8 +36,11 @@ function UpdateProfileForm({ guest, children }) {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <label htmlFor="nationality">Where are you from?</label>
-          <img
+          <Image
             src={countryFlag}
+            width={30}
+            height={16}
+            quality={100}
             alt="Country flag"
             className="h-5 rounded-sm"
           />
@@ -53,8 +59,11 @@ function UpdateProfileForm({ guest, children }) {
       </div>
 
       <div className="flex justify-end items-center gap-6">
-        <button className="bg-accent-500 px-8 py-4 text-primary-800 font-semibold hover:bg-accent-600 transition-all disabled:cursor-not-allowed disabled:bg-gray-500 disabled:text-gray-300">
-          Update profile
+        <button
+          className="bg-accent-500 px-8 py-4 text-primary-800 font-semibold hover:bg-accent-600 transition-all disabled:cursor-not-allowed disabled:bg-gray-500 disabled:text-gray-300"
+          disabled={isPending}
+        >
+          {isPending ? "Updating..." : "Update profile"}
         </button>
       </div>
     </form>

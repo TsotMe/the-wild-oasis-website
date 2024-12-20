@@ -4,7 +4,7 @@ import { auth, signIn, signOut } from "@/app/_lib/auth";
 import { updateGuest } from "@/app/_lib/data-service";
 import { revalidatePath } from "next/cache";
 
-export async function updateProfile(formData) {
+export async function updateProfile(previousState, formData) {
   const session = await auth();
   if (!session) throw new Error("You must be logged in");
 
