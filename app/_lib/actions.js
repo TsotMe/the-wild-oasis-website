@@ -1,7 +1,8 @@
 "use server";
 
 import { auth, signIn, signOut } from "@/app/_lib/auth";
-import { updateGuest } from "@/app/_lib/data-service";
+import { getBookings, updateGuest } from "@/app/_lib/data-service";
+import { supabase } from "@/app/_lib/supabase";
 import { revalidatePath } from "next/cache";
 
 export async function updateProfile(previousState, formData) {
@@ -19,6 +20,27 @@ export async function updateProfile(previousState, formData) {
   await updateGuest(session.user.guestId, updateData);
 
   revalidatePath("/account/profile", "page");
+}
+
+export async function deleteReservation(bookingId) {
+  const session = await auth();
+  if (!session) throw new Error("You must be logged in");
+
+  const bookings = await getBookings(session.user.guestId);
+
+  const guestBookingIds = bookings.map((booking) => booking.id);
+
+  if (!guestBookingIds.includes(bookingId))
+    throw new Error("You are not allowed to delete this booking :)");
+
+  const { error } = await supabase
+    .from("bookings")
+    .delete()
+    .eq("id", bookingId);
+
+  if (error) throw new Error("Booking could not be deleted");
+
+  revalidatePath("/account/reservations", "page");
 }
 
 export async function signInAction() {
